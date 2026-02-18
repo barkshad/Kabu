@@ -2,6 +2,7 @@ export interface Profile {
   id: string;
   email: string;
   full_name: string;
+  registration_number?: string;
   has_voted: boolean;
   role: 'student' | 'admin';
 }

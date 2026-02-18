@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { mockSupabase } from '../services/mockSupabase';
+import { CheckCircle, LogOut, Copy } from 'lucide-react';
 
 const Success: React.FC = () => {
   const location = useLocation();
@@ -9,47 +10,50 @@ const Success: React.FC = () => {
 
   useEffect(() => {
     const user = mockSupabase.getCurrentUser();
-    if (!user || !user.has_voted) {
-        // If they haven't voted, go back to dash
-        if (!user?.has_voted) navigate('/dashboard');
-        // If not logged in, login
-        if (!user) navigate('/login');
-    }
+    if (!user) { navigate('/login'); return; }
+    if (!user.has_voted) { navigate('/dashboard'); return; }
 
-    // Try getting receipt from router state, or fallback to a generated one if user is already marked voted (for demo robustness)
     const stateReceipt = location.state?.receipt;
     if (stateReceipt) {
         setReceipt(stateReceipt);
     } else {
-        // Fallback for page reload
-        setReceipt("RECOVERED-" + user?.id.substring(0,8).toUpperCase());
+        setReceipt(`KAB-${user.id.substring(0,4).toUpperCase()}-RECOVERED`);
     }
   }, [navigate, location.state]);
 
   return (
-    <div className="flex flex-col items-center justify-center pt-10 pb-20">
-      <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl text-center max-w-lg w-full border-t-8 border-kabarak-green">
-        <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <i className="fas fa-check text-4xl text-kabarak-green"></i>
+    <div className="flex flex-col items-center justify-center py-12 px-4">
+      <div className="bg-white rounded-3xl shadow-xl overflow-hidden max-w-lg w-full text-center relative">
+        <div className="h-3 bg-kabarak-green w-full absolute top-0"></div>
+        
+        <div className="p-10">
+          <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-green-50/50">
+            <CheckCircle className="w-12 h-12 text-kabarak-green" />
+          </div>
+          
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Vote Cast Successfully!</h1>
+          <p className="text-gray-600 mb-8">Thank you for exercising your democratic right in the 2024 Student Council Elections.</p>
+
+          <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-6 mb-8 relative group">
+            <p className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-2">Transaction ID</p>
+            <div className="font-mono text-xl md:text-2xl font-bold text-gray-800 break-all select-all">
+              {receipt}
+            </div>
+            <p className="text-xs text-gray-400 mt-2">Please save this ID for your records.</p>
+          </div>
+
+          <button 
+            onClick={() => mockSupabase.signOut().then(() => navigate('/login'))}
+            className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-kabarak-green w-full transition-colors"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out Securely
+          </button>
         </div>
         
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Vote Cast Successfully!</h2>
-        <p className="text-gray-600 mb-8">Thank you for participating in the Kabarak University Student Council Elections.</p>
-
-        <div className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-6 mb-8">
-          <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Digital Voting Receipt</p>
-          <div className="font-mono text-2xl font-bold text-kabarak-green tracking-widest select-all">
-            {receipt}
-          </div>
-          <p className="text-xs text-gray-400 mt-2">Keep this hash for your records.</p>
+        <div className="bg-gray-50 p-4 text-center border-t border-gray-100">
+          <img src="https://picsum.photos/100/40?random=logo" alt="Kabarak University" className="h-8 mx-auto opacity-50 grayscale" />
         </div>
-
-        <button 
-          onClick={() => mockSupabase.signOut().then(() => navigate('/login'))}
-          className="text-kabarak-green font-semibold hover:underline"
-        >
-          Sign out safely
-        </button>
       </div>
     </div>
   );

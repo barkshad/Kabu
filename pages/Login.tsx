@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mockSupabase } from '../services/mockSupabase';
+import { useSiteConfig } from '../contexts/ConfigContext';
 import { Lock, Mail, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
 
 const Login: React.FC = () => {
+  const { config } = useSiteConfig();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,12 +49,12 @@ const Login: React.FC = () => {
           {/* Logo Section */}
           <div className="text-center mb-10">
             <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-white border-4 border-kabarak-gold shadow-2xl mb-6 transform hover:scale-105 transition-transform duration-500">
-              <span className="text-kabarak-green font-serif font-bold text-5xl">K</span>
+              <span className="text-kabarak-green font-serif font-bold text-5xl">{config.universityName.charAt(0)}</span>
             </div>
-            <h1 className="text-4xl font-extrabold text-white tracking-tight drop-shadow-md">Kabarak University</h1>
+            <h1 className="text-4xl font-extrabold text-white tracking-tight drop-shadow-md">{config.universityName}</h1>
             <div className="flex items-center justify-center mt-3 space-x-2">
                 <span className="h-px w-8 bg-kabarak-gold/70"></span>
-                <p className="text-kabarak-gold uppercase tracking-[0.2em] text-sm font-bold">Elections 2026</p>
+                <p className="text-kabarak-gold uppercase tracking-[0.2em] text-sm font-bold">{config.electionTitle} {config.academicYear}</p>
                 <span className="h-px w-8 bg-kabarak-gold/70"></span>
             </div>
           </div>
@@ -68,7 +70,7 @@ const Login: React.FC = () => {
             
             <div className="p-8">
               <p className="text-gray-600 mb-8 text-center text-sm leading-relaxed">
-                Welcome to the 2026 Student Council Elections. verify your identity to access the digital ballot.
+                Welcome to the {config.academicYear} {config.electionTitle}. Verify your identity to access the digital ballot.
               </p>
 
               <form onSubmit={handleLogin} className="space-y-6">
@@ -135,7 +137,7 @@ const Login: React.FC = () => {
       
       {/* Simple Footer for Login */}
       <div className="py-8 text-center text-white/50 text-xs relative z-10">
-        &copy; 2026 Kabarak University ICT Department
+        &copy; {config.academicYear} {config.universityName} ICT Department
       </div>
     </div>
   );

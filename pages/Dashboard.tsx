@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mockSupabase } from '../services/mockSupabase';
+import { useSiteConfig } from '../contexts/ConfigContext';
 import { Profile } from '../types';
 import { Vote, FileText, ShieldCheck, AlertTriangle } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
+  const { config } = useSiteConfig();
   const [user, setUser] = useState<Profile | null>(null);
   const navigate = useNavigate();
 
@@ -52,21 +54,16 @@ const Dashboard: React.FC = () => {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">Action Required</h2>
-                  <p className="text-gray-600 mt-2 leading-relaxed">You have not cast your vote for the 2026 Student Council Elections yet. Your participation is crucial for the future of Kabarak.</p>
+                  <p className="text-gray-600 mt-2 leading-relaxed">{config.welcomeMessage}</p>
                 </div>
               </div>
               
               <div className="bg-slate-50/80 rounded-2xl p-6 border border-slate-100 mb-8 backdrop-blur-sm">
                 <h3 className="font-bold text-gray-900 mb-4 flex items-center">
                   <ShieldCheck className="w-5 h-5 mr-2 text-kabarak-green" />
-                  Voting Instructions
+                  Administrator Announcement
                 </h3>
-                <ul className="space-y-3 text-sm text-gray-600 list-none">
-                  <li className="flex items-center"><span className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></span> You must vote for all 5 positions.</li>
-                  <li className="flex items-center"><span className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></span> You can only select one candidate per position.</li>
-                  <li className="flex items-center"><span className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></span> Once submitted, your vote is final and cannot be changed.</li>
-                  <li className="flex items-center"><span className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></span> Your vote is fully anonymized.</li>
-                </ul>
+                <p className="text-sm text-gray-600 italic">"{config.announcement}"</p>
               </div>
             </div>
 
@@ -112,9 +109,9 @@ const Dashboard: React.FC = () => {
                Voter Resources
              </h3>
              <ul className="space-y-3 text-sm">
-               <li><a href="#" className="flex items-center text-gray-600 hover:text-kabarak-green transition-colors font-medium group"><span className="w-1 h-1 bg-gray-300 rounded-full mr-2 group-hover:bg-kabarak-green"></span> Download 2026 Voter Guide</a></li>
+               <li><a href="#" className="flex items-center text-gray-600 hover:text-kabarak-green transition-colors font-medium group"><span className="w-1 h-1 bg-gray-300 rounded-full mr-2 group-hover:bg-kabarak-green"></span> Download {config.academicYear} Voter Guide</a></li>
                <li><a href="#" className="flex items-center text-gray-600 hover:text-kabarak-green transition-colors font-medium group"><span className="w-1 h-1 bg-gray-300 rounded-full mr-2 group-hover:bg-kabarak-green"></span> Constitution & Bylaws</a></li>
-               <li><a href="#" className="flex items-center text-gray-600 hover:text-kabarak-green transition-colors font-medium group"><span className="w-1 h-1 bg-gray-300 rounded-full mr-2 group-hover:bg-kabarak-green"></span> Contact Electoral Commission</a></li>
+               <li><a href={`mailto:${config.contactEmail}`} className="flex items-center text-gray-600 hover:text-kabarak-green transition-colors font-medium group"><span className="w-1 h-1 bg-gray-300 rounded-full mr-2 group-hover:bg-kabarak-green"></span> Contact Electoral Commission</a></li>
              </ul>
           </div>
         </div>

@@ -28,9 +28,19 @@ export interface Vote {
   timestamp: string;
 }
 
-// For chart visualization
 export interface VoteResult {
   candidateName: string;
   positionTitle: string;
   votes: number;
+}
+
+export interface SiteConfig {
+  universityName: string;
+  electionTitle: string;
+  academicYear: string;
+  primaryColor: string;
+  secondaryColor: string;
+  contactEmail: string;
+  welcomeMessage: string;
+  announcement: string;
 }

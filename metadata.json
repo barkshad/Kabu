@@ -1,0 +1,5 @@
+{
+  "name": "Kabarak University Voting Platform",
+  "description": "A secure, branded voting platform for Kabarak University Student Council elections, featuring a simulated Supabase backend, email validation, and real-time results visualization.",
+  "requestFramePermissions": []
+}

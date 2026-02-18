@@ -48,7 +48,7 @@ class MockSupabaseService {
       // Seed admin and some users if empty
       this.profiles = [
         { id: 'admin_1', email: 'admin@kabarak.ac.ke', full_name: 'System Admin', registration_number: 'ADMIN-001', has_voted: false, role: 'admin' },
-        { id: 'student_1', email: 'student@kabarak.ac.ke', full_name: 'Test Student', registration_number: 'CS/M/1234/2024', has_voted: false, role: 'student' }
+        { id: 'student_1', email: 'student@kabarak.ac.ke', full_name: 'Test Student', registration_number: 'CS/M/1234/2026', has_voted: false, role: 'student' }
       ];
       this.saveToStorage();
     }
@@ -81,7 +81,7 @@ class MockSupabaseService {
         id: crypto.randomUUID(),
         email,
         full_name: formattedName,
-        registration_number: `REG/${Math.floor(1000 + Math.random() * 9000)}/2024`,
+        registration_number: `REG/${Math.floor(1000 + Math.random() * 9000)}/2026`,
         has_voted: false,
         role: 'student'
       };

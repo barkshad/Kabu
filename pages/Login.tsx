@@ -68,6 +68,11 @@ const Login: React.FC = () => {
         <div className="w-full max-w-md">
           {/* Logo Section */}
           <div className="text-center mb-8">
+            <div className="flex justify-center mb-4">
+              <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100 overflow-hidden p-2">
+                <img src="/logo.png" alt="Kabarak University Logo" className="w-full h-full object-contain drop-shadow-sm" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerHTML = '<span class="text-kabarak-green font-bold text-4xl font-serif">K</span>';}} />
+              </div>
+            </div>
             <h1 className="text-3xl font-bold text-kabarak-darkGreen">Kabarak University</h1>
             <p className="text-kabarak-green uppercase tracking-wide text-xs font-semibold mt-2">Voting & Governance Portal</p>
           </div>

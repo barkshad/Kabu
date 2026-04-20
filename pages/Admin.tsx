@@ -43,14 +43,37 @@ const Admin: React.FC = () => {
   const [loading, setLoading] = useState(true);
   
   // Form states
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [newCandidate, setNewCandidate] = useState({
-    userId: '',
-    positionId: '',
-    bio: '',
-    photoURL: ''
-  });
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [logoUrl, setLogoUrl] = useState('');
+
+  // Add listener for logo
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, 'settings', 'appGlobal'), (snap) => {
+      if (snap.exists()) {
+        setLogoUrl(snap.data().logoUrl);
+      }
+    });
+    return unsub;
+  }, []);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    
+    setUploadingLogo(true);
+    try {
+      const url = await uploadToCloudinary(file);
+      await updateDoc(doc(db, 'settings', 'appGlobal'), { logoUrl: url });
+      setLogoUrl(url);
+      await logAdminAction(user.uid, AuditAction.UPDATE_LOGO, 'settings', 'appGlobal');
+      alert('Logo updated successfully');
+    } catch (error) {
+      console.error(error);
+      alert('Logo upload failed');
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
 
   useEffect(() => {
     if (!profile || (profile.role !== 'admin_basic' && profile.role !== 'admin_super')) {
@@ -157,8 +180,22 @@ const Admin: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Overview Header */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
+      {/* Branding Section */}
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <h2 className="font-bold text-gray-900 mb-4">Branding</h2>
+        <label className="block text-xs font-semibold text-gray-700 mb-2">App Logo</label>
+        <div className="flex items-center space-x-4">
+          <div className="w-20 h-20 bg-gray-100 border border-gray-200 rounded-md overflow-hidden flex items-center justify-center flex-shrink-0">
+            {logoUrl ? <img src={logoUrl} className="w-full h-full object-contain" /> : <Upload className="text-gray-400" size={32} />}
+          </div>
+          <label className="cursor-pointer">
+            <span className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+              {uploadingLogo ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Upload Logo'}
+            </span>
+            <input type="file" className="hidden" onChange={handleLogoUpload} accept="image/*" />
+          </label>
+        </div>
+      </div>
         <div>
           <h1 className="text-xl font-bold text-gray-900">Admin Control Center</h1>
           <p className="text-sm text-gray-500">
@@ -186,7 +223,6 @@ const Admin: React.FC = () => {
             <Plus className="w-4 h-4 mr-2" /> Add Candidate
           </button>
         </div>
-      </div>
 
       {/* Stats Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

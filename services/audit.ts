@@ -10,6 +10,7 @@ export enum AuditAction {
   TOGGLE_ELECTION = 'TOGGLE_ELECTION',
   DISQUALIFY_CANDIDATE = 'DISQUALIFY_CANDIDATE',
   SWITCH_ELECTION = 'SWITCH_ELECTION',
+  UPDATE_LOGO = 'UPDATE_LOGO',
 }
 
 export const logAdminAction = async (

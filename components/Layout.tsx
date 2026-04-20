@@ -1,12 +1,14 @@
 import React from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useSettings } from '../contexts/SettingsContext';
 import { LogOut, User, LayoutDashboard, Vote, ShieldCheck, Settings } from 'lucide-react';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, signOut, role } = useAuth();
+  const { logoUrl } = useSettings();
 
   const handleLogout = async () => {
     await signOut();
@@ -29,8 +31,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <header className="bg-kabarak-green text-white shadow-sm border-b border-kabarak-darkGreen sticky top-0 z-40">
           <div className="container mx-auto px-4 py-3 flex items-center justify-between">
             <Link to="/dashboard" className="flex items-center space-x-3 cursor-pointer group">
-              <div className="w-10 h-10 bg-white rounded-md flex items-center justify-center border border-kabarak-gold shadow-sm">
-                 <span className="text-kabarak-green font-bold text-xl font-serif">K</span>
+              <div className="w-10 h-10 bg-white rounded-md flex items-center justify-center border border-kabarak-gold shadow-sm overflow-hidden p-0.5">
+                 <img src={logoUrl || '/logo.png'} alt="Kabarak Logo" className="w-full h-full object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerHTML = '<span class="text-kabarak-green font-bold text-xl font-serif">K</span>';}} />
               </div>
               <div className="hidden md:block">
                 <h1 className="font-bold text-lg leading-tight tracking-tight text-white">Kabarak University</h1>

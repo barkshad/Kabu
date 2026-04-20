@@ -76,7 +76,9 @@ const Admin: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!profile || (profile.role !== 'admin_basic' && profile.role !== 'admin_super')) {
+    const adminRole = localStorage.getItem('adminRole');
+    if ((!profile || (profile.role !== 'admin_basic' && profile.role !== 'admin_super')) && 
+        (adminRole !== 'admin_basic' && adminRole !== 'admin_super')) {
       navigate('/dashboard');
       return;
     }

@@ -22,6 +22,7 @@ const SuperAdminLogin: React.FC = () => {
 
     // Hardcoded check
     if (email === 'barakashadrack0@gmail.com' && password === 'baraka') {
+       localStorage.setItem('adminRole', 'admin_super');
        navigate('/admin/advanced');
     } else {
        setError('Invalid credentials.');

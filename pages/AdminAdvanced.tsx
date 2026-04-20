@@ -37,7 +37,8 @@ const AdminAdvanced: React.FC = () => {
   const [allowedAdmins, setAllowedAdmins] = useState<string[]>(JSON.parse(localStorage.getItem('allowedAdmins') || '["barakashadrack0@gmail.com"]'));
 
   useEffect(() => {
-    if (!profile || profile.role !== 'admin_super') {
+    const adminRole = localStorage.getItem('adminRole');
+    if ((!profile || profile.role !== 'admin_super') && adminRole !== 'admin_super') {
       navigate('/dashboard');
       return;
     }

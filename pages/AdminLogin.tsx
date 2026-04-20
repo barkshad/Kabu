@@ -20,6 +20,7 @@ const AdminLogin: React.FC = () => {
 
     // Hardcoded check
     if (email === 'barakashadrack0@gmail.com' && password === 'baraka') {
+       localStorage.setItem('adminRole', 'admin_basic');
        navigate('/admin');
     } else {
        setError('Invalid credentials.');

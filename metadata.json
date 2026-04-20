@@ -1,5 +1,6 @@
 {
   "name": "Kabarak University Voting Platform",
-  "description": "A secure, branded voting platform for Kabarak University Student Council elections, featuring a simulated Supabase backend, email validation, and real-time results visualization.",
-  "requestFramePermissions": []
+  "description": "A secure, role-based university voting system powered by Firebase, featuring real-time vote tabulation, student governance integrity controls, and automated election management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
 }

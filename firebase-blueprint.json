@@ -1,0 +1,95 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "System user profiles",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "admissionNumber": { "type": "string" },
+        "role": { "type": "string", "enum": ["student", "candidate", "admin_basic", "admin_super"] }
+      },
+      "required": ["id", "name", "email", "role"]
+    },
+    "Election": {
+      "title": "Election",
+      "description": "Election events",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "year": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "year", "isActive"]
+    },
+    "Position": {
+      "title": "Position",
+      "description": "Electoral positions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "electionId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "required": ["id", "electionId", "title"]
+    },
+    "Candidate": {
+      "title": "Candidate",
+      "description": "Candidates running for office",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "electionId": { "type": "string" },
+        "positionId": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "bio": { "type": "string" },
+        "isDisqualified": { "type": "boolean" },
+        "voteCount": { "type": "integer" }
+      },
+      "required": ["id", "userId", "electionId", "positionId"]
+    },
+    "Vote": {
+      "title": "Vote",
+      "description": "Cast votes",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "electionId": { "type": "string" },
+        "positionId": { "type": "string" },
+        "candidateId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "electionId", "positionId", "candidateId"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "System audit logs",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "adminId": { "type": "string" },
+        "action": { "type": "string" },
+        "targetType": { "type": "string" },
+        "targetId": { "type": "string" },
+        "metadata": { "type": "object" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "adminId", "action", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": { "schema": "User", "description": "Users collection" },
+    "/elections/{electionId}": { "schema": "Election", "description": "Elections collection" },
+    "/positions/{positionId}": { "schema": "Position", "description": "Positions collection" },
+    "/candidates/{candidateId}": { "schema": "Candidate", "description": "Candidates collection" },
+    "/votes/{voteId}": { "schema": "Vote", "description": "Votes collection" },
+    "/audit_logs/{logId}": { "schema": "AuditLog", "description": "Audit logs collection" }
+  }
+}

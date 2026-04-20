@@ -1,46 +1,67 @@
-export interface Profile {
+export type UserRole = 'student' | 'candidate' | 'admin_basic' | 'admin_super';
+
+export interface UserProfile {
   id: string;
+  name: string;
   email: string;
-  full_name: string;
-  registration_number?: string;
-  has_voted: boolean;
-  role: 'student' | 'admin';
+  admissionNumber: string;
+  role: UserRole;
+}
+
+export interface Election {
+  id: string;
+  title: string;
+  year: string;
+  isActive: boolean;
+  createdAt: any;
 }
 
 export interface Position {
   id: string;
+  electionId: string;
   title: string;
-  order: number;
+  description: string;
 }
 
 export interface Candidate {
   id: string;
-  name: string;
-  position_id: string;
-  manifesto_text: string;
-  image_url: string;
+  userId: string;
+  electionId: string;
+  positionId: string;
+  photoURL: string;
+  bio: string;
+  isDisqualified: boolean;
+  voteCount?: number;
 }
 
 export interface Vote {
+  id: string; // userId_positionId_electionId
+  userId: string;
+  electionId: string;
+  positionId: string;
+  candidateId: string;
+  createdAt: any;
+}
+
+export interface AuditLog {
   id: string;
-  position_id: string;
-  candidate_id: string;
-  timestamp: string;
+  adminId: string;
+  action: string;
+  targetType: string;
+  targetId: string;
+  metadata: any;
+  createdAt: any;
 }
 
-export interface VoteResult {
-  candidateName: string;
-  positionTitle: string;
-  votes: number;
-}
-
-export interface SiteConfig {
-  universityName: string;
-  electionTitle: string;
-  academicYear: string;
-  primaryColor: string;
-  secondaryColor: string;
-  contactEmail: string;
-  welcomeMessage: string;
-  announcement: string;
+export interface FirestoreErrorInfo {
+  error: string;
+  operationType: 'create' | 'update' | 'delete' | 'list' | 'get' | 'write';
+  path: string | null;
+  authInfo: {
+    userId: string;
+    email: string;
+    emailVerified: boolean;
+    isAnonymous: boolean;
+    providerInfo: { providerId: string; displayName: string; email: string; }[];
+  }
 }

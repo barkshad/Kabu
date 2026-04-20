@@ -1,0 +1,10 @@
+{
+  "projectId": "sheddy-ai-doctor",
+  "appId": "1:591196366601:web:82ba6867e4f69d8f2bd5d8",
+  "apiKey": "AIzaSyADM4vrfV0y9pHk1uKmJFGyndxMXz7hJbc",
+  "authDomain": "sheddy-ai-doctor.firebaseapp.com",
+  "firestoreDatabaseId": "ai-studio-f5c851ba-9c66-4488-a18e-cd976f7d562e",
+  "storageBucket": "sheddy-ai-doctor.firebasestorage.app",
+  "messagingSenderId": "591196366601",
+  "measurementId": ""
+}

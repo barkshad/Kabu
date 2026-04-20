@@ -97,6 +97,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <div className="text-center md:text-right">
                 <p className="font-medium text-slate-600">&copy; {new Date().getFullYear()} Secure Voting Platform</p>
                 <p className="text-xs mt-1 text-kabarak-green font-semibold">Authorized Access Only</p>
+                <div className="mt-2 flex gap-2 justify-center md:justify-end text-[10px] text-gray-300 hover:text-gray-400">
+                  <Link to="/admin" className="cursor-default">A</Link>
+                  <Link to="/admin/advanced" className="cursor-default">S</Link>
+                </div>
               </div>
             </div>
           </div>

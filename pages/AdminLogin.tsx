@@ -34,7 +34,14 @@ const AdminLogin: React.FC = () => {
         setError('Unauthorized: Only administrators can access this portal.');
       }
     } catch (err: any) {
-      setError('Authentication failed. Check your credentials.');
+      console.error('Login error:', err);
+      if (err.code === 'auth/user-not-found') {
+        setError('No account found with this email.');
+      } else if (err.code === 'auth/wrong-password') {
+        setError('Incorrect password.');
+      } else {
+        setError('Authentication failed. Check your credentials.');
+      }
     } finally {
       setLoading(false);
     }

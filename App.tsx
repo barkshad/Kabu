@@ -4,6 +4,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import { SettingsProvider } from './contexts/SettingsContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
+import AdminLogin from './pages/AdminLogin';
+import SuperAdminLogin from './pages/SuperAdminLogin';
 import Dashboard from './pages/Dashboard';
 import VotingBooth from './pages/VotingBooth';
 import Success from './pages/Success';
@@ -18,6 +20,8 @@ const App: React.FC = () => {
           <Layout>
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
+              <Route path="/super-admin-login" element={<SuperAdminLogin />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/booth" element={<VotingBooth />} />
               <Route path="/success" element={<Success />} />

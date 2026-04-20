@@ -179,34 +179,36 @@ const Admin: React.FC = () => {
   if (loading) return <div className="p-8 text-center text-gray-500"><Loader2 className="animate-spin inline mr-2" /> Loading...</div>;
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 md:p-8 space-y-8">
       {/* Branding Section */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <h2 className="font-bold text-gray-900 mb-4">Branding</h2>
-        <label className="block text-xs font-semibold text-gray-700 mb-2">App Logo</label>
-        <div className="flex items-center space-x-4">
-          <div className="w-20 h-20 bg-gray-100 border border-gray-200 rounded-md overflow-hidden flex items-center justify-center flex-shrink-0">
-            {logoUrl ? <img src={logoUrl} className="w-full h-full object-contain" /> : <Upload className="text-gray-400" size={32} />}
+      <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-neutral-200">
+        <h2 className="text-lg font-bold text-neutral-900 mb-6">Application Branding</h2>
+        <div className="flex flex-col sm:flex-row items-center gap-6">
+          <div className="w-24 h-24 bg-neutral-50 border border-neutral-200 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0 shadow-inner">
+            {logoUrl ? <img src={logoUrl} className="w-full h-full object-contain" /> : <Upload className="text-neutral-400" size={32} />}
           </div>
-          <label className="cursor-pointer">
-            <span className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
-              {uploadingLogo ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Upload Logo'}
+          <label className="cursor-pointer group flex-shrink-0">
+            <span className="inline-flex items-center gap-2 py-2.5 px-5 bg-white border border-neutral-300 rounded-lg text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:border-neutral-400 transition-all shadow-sm">
+              {uploadingLogo ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload size={16} />}
+              {uploadingLogo ? 'Uploading...' : 'Upload New Logo'}
             </span>
             <input type="file" className="hidden" onChange={handleLogoUpload} accept="image/*" />
           </label>
         </div>
       </div>
+
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Admin Control Center</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-neutral-900">Admin Control Center</h1>
+          <p className="text-sm text-neutral-500 mt-1">
             {activeElection ? `Current Election: ${activeElection.title} (${activeElection.year})` : 'No Active Election'}
           </p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-3">
           {activeElection && (
             <button 
               onClick={toggleElectionStatus}
-              className={`flex items-center px-4 py-2 rounded-md text-sm font-semibold border transition-colors ${
+              className={`flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold border transition-all shadow-sm ${
                 activeElection.isActive 
                 ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' 
                 : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
@@ -218,11 +220,12 @@ const Admin: React.FC = () => {
           )}
           <button 
             onClick={() => setShowAddModal(true)}
-            className="flex items-center px-4 py-2 bg-kabarak-green text-white rounded-md text-sm font-bold shadow-sm hover:bg-kabarak-darkGreen transition-colors"
+            className="flex items-center px-5 py-2.5 bg-kabarak-green text-white rounded-lg text-sm font-bold shadow-sm hover:bg-kabarak-darkGreen transition-all"
           >
             <Plus className="w-4 h-4 mr-2" /> Add Candidate
           </button>
         </div>
+      </div>
 
       {/* Stats Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -12,38 +12,20 @@ const SuperAdminLogin: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { refreshProfile, signOut } = useAuth();
+  // Using Firestore to persist list of allowed admins would be better, but mock with local storage for now
+  const [allowedAdmins] = useState(['barakashadrack0@gmail.com']); 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    try {
-      const cred = await signInWithEmailAndPassword(auth, email, password);
-      
-      // Verify Role
-      const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
-      const role = userDoc.exists() ? userDoc.data().role : null;
-
-      if (role === 'admin_super') {
-        await refreshProfile();
-        navigate('/admin/advanced');
-      } else {
-        await signOut();
-        setError('Unauthorized: Only super administrators can access this portal.');
-      }
-    } catch (err: any) {
-      console.error('Super Admin Login error:', err);
-      if (err.code === 'auth/user-not-found') {
-        setError('No account found with this email.');
-      } else if (err.code === 'auth/wrong-password') {
-        setError('Incorrect password.');
-      } else {
-        setError('Authentication failed. Check your credentials.');
-      }
-    } finally {
-      setLoading(false);
+    // Hardcoded check
+    if (email === 'barakashadrack0@gmail.com' && password === 'baraka') {
+       navigate('/admin/advanced');
+    } else {
+       setError('Invalid credentials.');
+       setLoading(false);
     }
   };
 

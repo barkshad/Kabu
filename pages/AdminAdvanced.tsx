@@ -21,7 +21,8 @@ import {
   Lock, 
   Unlock,
   AlertTriangle,
-  Loader2
+  Loader2,
+  UserPlus
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -33,6 +34,7 @@ const AdminAdvanced: React.FC = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [allowedAdmins, setAllowedAdmins] = useState<string[]>(JSON.parse(localStorage.getItem('allowedAdmins') || '["barakashadrack0@gmail.com"]'));
 
   useEffect(() => {
     if (!profile || profile.role !== 'admin_super') {
@@ -98,6 +100,15 @@ const AdminAdvanced: React.FC = () => {
     await logAdminAction(user.uid, AuditAction.SWITCH_ELECTION, 'election', 'new', { title, year });
   };
 
+  const addAdmin = () => {
+    const email = window.prompt('Enter new admin email:');
+    if (email && !allowedAdmins.includes(email)) {
+      const newList = [...allowedAdmins, email];
+      setAllowedAdmins(newList);
+      localStorage.setItem('allowedAdmins', JSON.stringify(newList));
+    }
+  };
+
   if (loading) return <div className="p-8 text-center text-gray-500"><Loader2 className="animate-spin inline mr-2" /> Loading System Logs...</div>;
 
   return (
@@ -110,12 +121,20 @@ const AdminAdvanced: React.FC = () => {
             <p className="text-red-200 text-sm">Highest privilege system controls active</p>
           </div>
         </div>
-        <button 
-          onClick={createNewElection}
-          className="bg-white text-red-900 px-4 py-2 rounded-md font-semibold text-sm hover:bg-gray-100 transition-colors shadow-sm"
-        >
-          Initialize New Election
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={addAdmin}
+            className="bg-white text-red-900 px-4 py-2 rounded-md font-semibold text-sm hover:bg-gray-100 transition-colors shadow-sm flex items-center"
+          >
+            <UserPlus size={16} className="mr-2" /> Add Admin
+          </button>
+          <button 
+            onClick={createNewElection}
+            className="bg-white text-red-900 px-4 py-2 rounded-md font-semibold text-sm hover:bg-gray-100 transition-colors shadow-sm"
+          >
+            Initialize New Election
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

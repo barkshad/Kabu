@@ -4,18 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kabarak University Voting Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <script>
       tailwind.config = {
         theme: {
           extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              serif: ['Merriweather', 'serif'],
+            },
             colors: {
               kabarak: {
-                green: '#006400',
-                gold: '#FFD700',
-                lightGold: '#FFF5CC',
-                darkGreen: '#004d00',
+                green: '#1a472a',
+                gold: '#b8974a',
+                lightGold: '#f4ede1',
+                darkGreen: '#11331c',
               }
             }
           }
@@ -24,7 +31,12 @@
     </script>
     <style>
       body {
-        background-color: #f3f4f6;
+        background-color: #f8f9fa;
+        font-family: 'Inter', sans-serif;
+        color: #333333;
+      }
+      h1, h2, h3, .font-serif {
+        font-family: 'Merriweather', serif;
       }
     </style>
   <script type="importmap">

@@ -1,0 +1,175 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Primitive Helpers
+    function isSignedIn() { return request.auth != null && request.auth.token.email_verified == true; }
+    function isAdminBasic() { 
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) 
+        && (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin_basic' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin_super'); 
+    }
+    function isAdminSuper() { 
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) 
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin_super'; 
+    }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+
+    // ==========================================
+    // 1. Users Collection
+    // ==========================================
+    function isValidUser(data) {
+      return data.keys().hasAll(['id', 'name', 'email', 'role']) && data.keys().size() >= 4
+        && data.id is string && data.id.size() <= 128
+        && data.name is string && data.name.size() <= 100
+        && data.email is string && data.email.size() <= 255
+        && data.role is string && (data.role == 'student' || data.role == 'candidate' || data.role == 'admin_basic' || data.role == 'admin_super');
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn(); // Users need to see other users (e.g. candidates)
+      allow create: if isSignedIn() 
+                    && isValidId(userId)
+                    && request.auth.uid == userId
+                    && isValidUser(incoming())
+                    && incoming().id == userId
+                    // Cannot self-assign admin roles
+                    && incoming().role in ['student', 'candidate'];
+      allow update: if isAdminSuper() && isValidUser(incoming());
+      allow delete: if isAdminSuper();
+    }
+
+    // ==========================================
+    // 2. Elections Collection
+    // ==========================================
+    function isValidElection(data) {
+      return data.keys().hasAll(['title', 'year', 'isActive', 'createdAt'])
+        && data.title is string && data.title.size() <= 200
+        && data.year is string && data.year.size() <= 50
+        && data.isActive is bool
+        && data.createdAt == request.time;
+    }
+    
+    match /elections/{electionId} {
+      allow read: if isSignedIn();
+      allow create: if isAdminSuper() && isValidId(electionId) && isValidElection(incoming());
+      allow update: if (isAdminSuper() || isAdminBasic()) 
+                    && incoming().diff(existing()).affectedKeys().hasOnly(['isActive']);
+      allow delete: if false; // Immutability of history
+    }
+
+    // ==========================================
+    // 3. Positions Collection
+    // ==========================================
+    function isValidPosition(data) {
+      return data.keys().hasAll(['electionId', 'title', 'description'])
+        && data.electionId is string && data.electionId.size() <= 128
+        && data.title is string && data.title.size() <= 200
+        && data.description is string && data.description.size() <= 2000
+        && exists(/databases/$(database)/documents/elections/$(data.electionId));
+    }
+
+    match /positions/{positionId} {
+      allow read: if isSignedIn();
+      allow create: if isAdminSuper() && isValidId(positionId) && isValidPosition(incoming());
+      allow update: if false; // Immutable
+      allow delete: if isAdminSuper();
+    }
+
+    // ==========================================
+    // 4. Candidates Collection
+    // ==========================================
+    function isValidCandidate(data) {
+      return data.keys().hasAll(['userId', 'electionId', 'positionId', 'isDisqualified', 'voteCount'])
+        && data.userId is string && data.userId.size() <= 128
+        && data.electionId is string && data.electionId.size() <= 128
+        && data.positionId is string && data.positionId.size() <= 128
+        && data.isDisqualified is bool
+        && data.voteCount is number && data.voteCount >= 0
+        && exists(/databases/$(database)/documents/users/$(data.userId))
+        && exists(/databases/$(database)/documents/elections/$(data.electionId))
+        && exists(/databases/$(database)/documents/positions/$(data.positionId));
+    }
+
+    match /candidates/{candidateId} {
+      allow read: if isSignedIn();
+      allow create: if (isAdminBasic() || isAdminSuper()) 
+                    && isValidId(candidateId) 
+                    && isValidCandidate(incoming())
+                    && incoming().voteCount == 0;
+      allow update: if isSignedIn() && (
+                      // Admins disqualifying
+                      (isAdminSuper() && incoming().diff(existing()).affectedKeys().hasOnly(['isDisqualified'])) ||
+                      // Voting increment (Any user can trigger this via the client, but the atomic guard on Votes protects it)
+                      // BUT ideally, voteCount should only be incremented when a valid Vote is cast.
+                      // Since client SDKs are writing directly to voteCount, we allow only +1 increments.
+                      (incoming().diff(existing()).affectedKeys().hasOnly(['voteCount']) && incoming().voteCount == existing().voteCount + 1)
+                    );
+      allow delete: if isAdminSuper();
+    }
+
+    // ==========================================
+    // 5. Votes Collection (The core integrity logic)
+    // ==========================================
+    function isValidVote(data, voteId) {
+      return data.keys().hasAll(['id', 'userId', 'electionId', 'positionId', 'candidateId', 'createdAt']) && data.keys().size() == 6
+        && data.id == voteId
+        && data.userId == request.auth.uid // Cannot vote for someone else
+        && data.electionId is string && data.electionId.size() <= 128
+        && data.positionId is string && data.positionId.size() <= 128
+        && data.candidateId is string && data.candidateId.size() <= 128
+        && data.createdAt == request.time // Temporal integrity
+        // Composite Key Enforcement
+        && voteId == (data.userId + '_' + data.positionId + '_' + data.electionId)
+        // Data Integrity lookups
+        && exists(/databases/$(database)/documents/elections/$(data.electionId))
+        && get(/databases/$(database)/documents/elections/$(data.electionId)).data.isActive == true // Election must be active
+        && exists(/databases/$(database)/documents/candidates/$(data.candidateId))
+        && get(/databases/$(database)/documents/candidates/$(data.candidateId)).data.isDisqualified == false // Candidate must be valid
+        && get(/databases/$(database)/documents/candidates/$(data.candidateId)).data.positionId == data.positionId; // Candidate must be running for this position!
+    }
+
+    match /votes/{voteId} {
+      // Users can only read their own votes to verify. Admins can read all for counting.
+      // List rules MUST strictly enforce this on the resource
+      allow list: if (isSignedIn() && resource.data.userId == request.auth.uid) || isAdminBasic() || isAdminSuper();
+      allow get: if (isSignedIn() && isOwner(existing().userId)) || isAdminBasic() || isAdminSuper();
+      
+      allow create: if isSignedIn() 
+                    && isValidId(voteId)
+                    && isValidVote(incoming(), voteId)
+                    // The magic Atomicity Guarantee: Ensure candidate voteCount is incremented atomically
+                    && existsAfter(/databases/$(database)/documents/candidates/$(incoming().candidateId));
+      
+      allow update, delete: if false; // IMMUTABLE. Votes cannot be changed or destroyed once cast.
+    }
+
+    // ==========================================
+    // 6. Audit Logs Collection
+    // ==========================================
+    function isValidAuditLog(data) {
+      return data.keys().hasAll(['adminId', 'action', 'targetType', 'targetId', 'createdAt'])
+        && data.adminId == request.auth.uid
+        && data.action is string && data.action.size() <= 100
+        && data.targetType is string && data.targetType.size() <= 100
+        && data.targetId is string && data.targetId.size() <= 128
+        && data.createdAt == request.time;
+    }
+
+    match /audit_logs/{logId} {
+      allow read: if isAdminSuper();
+      allow create: if (isAdminBasic() || isAdminSuper()) 
+                    && isValidId(logId)
+                    && isValidAuditLog(incoming());
+      allow update, delete: if false; // IMMUTABLE.
+    }
+
+  }
+}

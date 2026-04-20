@@ -8,7 +8,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuth } from '../contexts/AuthContext';
-import { Election, Candidate, Position } from '../types';
+import { Election } from '../types';
 import { 
   Vote, 
   Award, 
@@ -25,8 +25,6 @@ const Dashboard: React.FC = () => {
   const { profile, user } = useAuth();
   const navigate = useNavigate();
   const [activeElection, setActiveElection] = useState<Election | null>(null);
-  const [candidates, setCandidates] = useState<Candidate[]>([]);
-  const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -48,97 +46,93 @@ const Dashboard: React.FC = () => {
     return () => unsubElection();
   }, [user, navigate]);
 
-  if (loading) return <div className="p-8 text-center"><Loader2 className="animate-spin inline mr-2" /> Loading Dashboard...</div>;
+  if (loading) return <div className="p-8 flex justify-center text-gray-500"><Loader2 className="animate-spin inline mr-2" /> Loading System Data...</div>;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-6">
       {/* Welcome Banner */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-kabarak-green/5 rounded-full -mr-16 -mt-16"></div>
-        <div className="relative z-10 flex flex-col items-center md:items-start">
-           <span className="bg-kabarak-gold/20 text-kabarak-green text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-4">Official Student Portal</span>
-           <h1 className="text-3xl font-extrabold text-gray-900 text-center md:text-left">Welcome Back, {profile?.name}!</h1>
-           <p className="text-gray-500 mt-2 text-center md:text-left max-w-md">Your participation in student council elections shapes the future of Kabarak University's student governance.</p>
+      <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="flex flex-col items-center md:items-start w-full">
+           <span className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2 border border-gray-200 px-2 py-1 rounded">Student Portal</span>
+           <h1 className="text-2xl font-bold text-gray-900 text-center md:text-left">Welcome, {profile?.name}</h1>
+           <p className="text-gray-600 mt-2 text-center md:text-left max-w-xl text-sm leading-relaxed">
+              Verify your status and access the student governance election system. Actions taken in this portal are logged for integrity.
+           </p>
            
-           <div className="mt-8 flex flex-wrap gap-4 justify-center md:justify-start">
+           <div className="mt-6 flex flex-wrap gap-4 justify-center md:justify-start w-full">
              <Link 
               to="/booth" 
-              className="px-8 py-3 bg-kabarak-green text-white rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all flex items-center"
+              className="px-6 py-2 bg-kabarak-green text-white rounded-md font-semibold hover:bg-kabarak-darkGreen transition-colors flex items-center text-sm"
              >
-               <Vote size={18} className="mr-2" /> Access Voting Booth
+               <Vote size={16} className="mr-2" /> Access Voting Booth
              </Link>
              {profile?.role === 'candidate' && (
-               <div className="px-8 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 flex items-center">
-                 <User size={18} className="mr-2 text-kabarak-gold" /> Candidate Status: Active
+               <div className="px-6 py-2 bg-gray-50 border border-gray-200 text-gray-700 rounded-md font-semibold flex items-center text-sm">
+                 <User size={16} className="mr-2 text-kabarak-gold" /> Candidate Status: Active
                </div>
              )}
            </div>
         </div>
-        <div className="hidden lg:block relative">
-           <div className="bg-kabarak-gold/10 w-48 h-48 rounded-3xl rotate-12 flex items-center justify-center">
-              <ShieldCheck size={100} className="text-kabarak-green -rotate-12" />
-           </div>
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Election Status */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 h-fit">
-           <h3 className="font-bold text-gray-800 mb-6 flex items-center">
-             <Clock className="mr-2 text-kabarak-gold" size={20} />
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 h-fit">
+           <h2 className="text-base font-bold text-gray-800 mb-4 flex items-center border-b border-gray-100 pb-2">
+             <Clock className="mr-2 text-gray-400" size={18} />
              System Status
-           </h3>
-           <div className="space-y-6">
-              <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                <p className="text-xs font-bold text-gray-400 uppercase">Current Election</p>
+           </h2>
+           <div className="space-y-4">
+              <div className="p-4 bg-gray-50 rounded-md border border-gray-200">
+                <p className="text-xs font-semibold text-gray-500 uppercase">Current Election</p>
                 <p className="font-bold text-gray-900 mt-1">{activeElection?.title || 'No active election'}</p>
-                <p className="text-xs text-gray-500 mt-1">{activeElection?.year}</p>
+                <p className="text-xs text-gray-600 mt-1">Academic Year: {activeElection?.year || 'N/A'}</p>
               </div>
-              <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-between">
+              <div className="p-4 bg-gray-50 rounded-md border border-gray-200 flex items-center justify-between">
                 <div>
-                   <p className="text-xs font-bold text-gray-400 uppercase">Voting Period</p>
+                   <p className="text-xs font-semibold text-gray-500 uppercase">Voting Period</p>
                    {activeElection?.isActive ? (
-                     <p className="text-sm font-bold text-green-600 mt-1">Live - Accepting Ballots</p>
+                     <p className="text-sm font-bold text-kabarak-green mt-1 flex items-center">
+                        <span className="w-2 h-2 bg-kabarak-green rounded-full mr-2"></span>
+                        Active
+                     </p>
                    ) : (
-                     <p className="text-sm font-bold text-red-400 mt-1">Closed/Paused</p>
+                     <p className="text-sm font-bold text-gray-500 mt-1 flex items-center">
+                        <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+                        Closed
+                     </p>
                    )}
                 </div>
-                {activeElection?.isActive && <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>}
               </div>
            </div>
         </div>
 
         {/* Info & Integrity */}
-        <div className="lg:col-span-2 bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-           <h3 className="font-bold text-gray-800 mb-6 flex items-center">
-             <Award className="mr-2 text-kabarak-green" size={20} />
-             Voting Integrity & Security
-           </h3>
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="lg:col-span-2 bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+           <h2 className="text-base font-bold text-gray-800 mb-4 flex items-center border-b border-gray-100 pb-2">
+             <ShieldCheck className="mr-2 text-gray-400" size={18} />
+             System Integrity
+           </h2>
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               <div className="space-y-2">
-                 <div className="w-10 h-10 bg-green-50 text-kabarak-green rounded-xl flex items-center justify-center mb-4">
-                    <ShieldCheck size={20} />
-                 </div>
-                 <h4 className="font-bold text-gray-900">Anonymized Ballots</h4>
-                 <p className="text-sm text-gray-500">Your specific vote is encrypted and stored separately from your profile identity to ensure complete ballot secrecy.</p>
+                 <h3 className="font-semibold text-gray-900 text-sm">Anonymized Ballots</h3>
+                 <p className="text-sm text-gray-600 leading-relaxed">
+                   Your specific vote is stored separately from your profile identity to ensure complete ballot secrecy. Auditing only verifies participation, not selection.
+                 </p>
               </div>
               <div className="space-y-2">
-                 <div className="w-10 h-10 bg-gold-50 text-[#FFD700] rounded-xl flex items-center justify-center mb-4 bg-[#FFD700]/10">
-                    <AlertCircle size={20} />
-                 </div>
-                 <h4 className="font-bold text-gray-900">Single Vote Policy</h4>
-                 <p className="text-sm text-gray-500">The system strictly enforces one vote per position. Duplicate attempts are automatically blocked by blockchain-inspired hashing.</p>
+                 <h3 className="font-semibold text-gray-900 text-sm">Single Vote Policy</h3>
+                 <p className="text-sm text-gray-600 leading-relaxed">
+                   The system strictly enforces one vote per position. Duplicate attempts are automatically rejected by database constraints.
+                 </p>
               </div>
            </div>
            
-           <div className="mt-8 p-4 bg-kabarak-green/5 rounded-2xl border border-kabarak-green/10 flex items-center justify-between">
+           <div className="mt-6 p-4 bg-gray-50 rounded-md border border-gray-200 flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                 <div className="p-2 bg-white rounded-lg shadow-sm">
-                   <Info size={16} className="text-kabarak-green" />
-                 </div>
-                 <p className="text-xs font-medium text-gray-600">Need help? Email the support team at ict@kabarak.ac.ke</p>
+                 <Info size={16} className="text-gray-400" />
+                 <p className="text-xs font-medium text-gray-600">Need administrative support? Contact ict@kabarak.ac.ke</p>
               </div>
-              <ChevronRight size={16} className="text-gray-300" />
            </div>
         </div>
       </div>

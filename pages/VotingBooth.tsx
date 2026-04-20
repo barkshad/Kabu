@@ -86,7 +86,7 @@ const VotingBooth: React.FC = () => {
     if (!user || !activeElection) return;
     
     if (Object.keys(votes).length < positions.length) {
-      if (!window.confirm('You haven\'t voted for all positions. Proceed anyway?')) return;
+      if (!window.confirm('You haven\'t voted for all positions. Are you sure you want to proceed?')) return;
     }
 
     setSubmitting(true);
@@ -115,61 +115,60 @@ const VotingBooth: React.FC = () => {
       navigate('/success');
     } catch (error) {
       console.error('Voting error:', error);
-      alert('An error occurred while submitting your votes. You might have already voted for some positions.');
+      alert('An error occurred while submitting your votes. Please report to the ICT department.');
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (loading) return <div className="p-8 text-center min-h-[60vh] flex flex-col justify-center items-center">
-    <Loader2 className="animate-spin text-kabarak-green mb-4 h-12 w-12" />
-    <p className="text-gray-500 font-medium tracking-tight">Authenticating Digital Ballot...</p>
+  if (loading) return <div className="p-8 text-center min-h-[50vh] flex flex-col justify-center items-center">
+    <Loader2 className="animate-spin text-kabarak-green mb-4 h-8 w-8" />
+    <p className="text-gray-600 text-sm font-medium">Authenticating Ballot...</p>
   </div>;
 
   if (!activeElection) return (
     <div className="max-w-md mx-auto text-center py-20 px-6">
-      <div className="w-20 h-20 bg-red-50 text-red-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
-        <XCircle size={40} />
+      <div className="w-16 h-16 bg-gray-100 text-gray-500 rounded-full flex items-center justify-center mx-auto mb-6">
+        <XCircle size={32} />
       </div>
-      <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">Election Vault Closed</h2>
-      <p className="text-gray-500 mt-3 leading-relaxed">The voting platform is currently offline or the session has expired. Check institutional announcements for schedule.</p>
-      <button onClick={() => navigate('/dashboard')} className="mt-8 px-8 py-3 bg-gray-900 text-white rounded-xl font-bold">Return to Dashboard</button>
+      <h2 className="text-xl font-bold text-gray-900">Election System Inactive</h2>
+      <p className="text-gray-600 mt-2 text-sm leading-relaxed">The voting platform is currently offline. Refer to the official university communication for the election schedule.</p>
+      <button onClick={() => navigate('/dashboard')} className="mt-8 px-6 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-md text-sm font-semibold transition-colors">Return to Dashboard</button>
     </div>
   );
 
   return (
-    <div className="max-w-6xl mx-auto space-y-12 pb-32">
-      <header className="text-center bg-white p-10 rounded-3xl shadow-sm border border-gray-100">
-        <div className="inline-flex items-center px-4 py-1.5 bg-kabarak-green/10 text-kabarak-green rounded-full text-[10px] font-bold uppercase tracking-widest mb-6">
+    <div className="max-w-5xl mx-auto space-y-10 pb-32">
+      <header className="text-center bg-white p-8 rounded-lg shadow-sm border border-gray-200">
+        <div className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 rounded text-[10px] font-bold uppercase tracking-widest mb-4 border border-gray-200">
           <ShieldCheck size={14} className="mr-2" />
-          Secure 256-bit Encrypted Session
+          Encrypted Voting Session active
         </div>
-        <h1 className="text-5xl font-black text-gray-900 tracking-tighter mb-4">{activeElection.title}</h1>
-        <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-sm">{activeElection.year} Academic Cycle</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{activeElection.title}</h1>
+        <p className="text-gray-500 font-semibold uppercase tracking-wider text-xs">Academic Year {activeElection.year}</p>
         
-        <div className="mt-8 flex items-center justify-center space-x-3 text-xs text-slate-500 bg-slate-50 py-3 px-6 rounded-2xl w-fit mx-auto border border-slate-100 italic">
-          <Info size={14} className="text-kabarak-gold" />
-          <span>Select your candidates for each position below. Your vote is final once cast.</span>
+        <div className="mt-6 flex items-center justify-center space-x-3 text-sm text-gray-600 bg-gray-50 py-3 px-6 rounded-md w-fit mx-auto border border-gray-200">
+          <Info size={16} className="text-kabarak-green" />
+          <span>Select ONE candidate for each position. Your cast ballot is final.</span>
         </div>
       </header>
 
-      <div className="space-y-16">
+      <div className="space-y-12">
         {positions.map((pos, idx) => {
           const posCandidates = candidates.filter(c => c.positionId === pos.id);
           return (
-            <section key={pos.id} className="relative group">
-              <div className="flex items-center space-x-6 mb-8">
-                 <div className="flex items-center justify-center w-12 h-12 bg-kabarak-green text-white rounded-2xl font-black text-xl shadow-lg ring-4 ring-kabarak-green/5">
+            <section key={pos.id} className="bg-white rounded-lg p-8 shadow-sm border border-gray-200">
+              <div className="flex items-center space-x-4 mb-6 pb-4 border-b border-gray-100">
+                 <div className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-700 rounded font-bold text-sm border border-gray-200">
                    {idx + 1}
                  </div>
                  <div>
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">{pos.title}</h2>
-                    <p className="text-sm text-slate-400 font-medium">Choose one from the candidates below</p>
+                    <h2 className="text-lg font-bold text-gray-900">{pos.title}</h2>
+                    <p className="text-sm text-gray-500 font-medium mt-0.5">Select a candidate for this position</p>
                  </div>
-                 <div className="flex-grow h-px bg-slate-100"></div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {posCandidates.map(c => {
                   const u = users.find(user => user.id === c.userId);
                   const isSelected = votes[pos.id] === c.id;
@@ -177,73 +176,71 @@ const VotingBooth: React.FC = () => {
                     <div 
                       key={c.id} 
                       onClick={() => handleVoteSelect(pos.id, c.id)}
-                      className={`relative group cursor-pointer transition-all duration-500 rounded-[2.5rem] overflow-hidden border-2 flex flex-col ${
+                      className={`cursor-pointer transition-colors rounded-lg overflow-hidden border-2 flex flex-col ${
                         isSelected 
-                        ? 'border-kabarak-green ring-8 ring-kabarak-green/5 shadow-2xl bg-white scale-[1.02]' 
-                        : 'border-transparent bg-white hover:border-slate-200 shadow-sm hover:shadow-xl'
+                        ? 'border-kabarak-green bg-kabarak-green/5 ring-1 ring-kabarak-green ring-offset-2' 
+                        : 'border-gray-200 bg-white hover:border-gray-300'
                       }`}
                     >
-                      <div className="aspect-[5/4] overflow-hidden bg-slate-50 relative">
+                      <div className="aspect-[4/3] overflow-hidden bg-gray-100 relative border-b border-gray-200">
                         <img 
                           src={c.photoURL || `https://picsum.photos/seed/${c.id}/400/300`} 
                           referrerPolicy="no-referrer"
-                          className={`w-full h-full object-cover transition-all duration-1000 ${isSelected ? 'scale-110 grayscale-0' : 'scale-100 grayscale-[20%] group-hover:scale-105 group-hover:grayscale-0'}`} 
+                          className="w-full h-full object-cover"
+                          alt="Candidate"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-gray-900/80 to-transparent p-4">
+                          <p className="text-white font-bold text-base mb-0.5">{u?.name}</p>
+                          <p className="text-gray-300 font-semibold text-[10px] uppercase tracking-wider">{u?.admissionNumber}</p>
+                        </div>
                         
                         {isSelected && (
-                          <div className="absolute top-4 right-4 bg-kabarak-green text-white p-2 rounded-2xl shadow-2xl animate-in zoom-in duration-300">
-                            <CheckCircle size={28} />
+                          <div className="absolute top-3 right-3 bg-white text-kabarak-green rounded-full shadow-sm">
+                            <CheckCircle size={24} />
                           </div>
                         )}
-
-                        <div className="absolute bottom-6 left-6">
-                          <p className="text-white font-black text-xl leading-none mb-1">{u?.name}</p>
-                          <p className="text-kabarak-gold font-bold text-[10px] uppercase tracking-widest">{u?.admissionNumber}</p>
-                        </div>
                       </div>
-                      <div className="p-8 flex-grow flex flex-col">
-                        <p className="text-sm text-slate-500 line-clamp-4 leading-relaxed font-medium italic relative">
-                           <span className="text-4xl text-kabarak-gold absolute -top-4 -left-2 opacity-20">"</span>
-                           {c.bio || "Candidate has not provided a manifesto summary."}
+                      <div className="p-4 flex-grow flex flex-col">
+                        <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
+                           {c.bio || "No manifesto provided."}
                         </p>
-                        <div className="mt-auto pt-6 flex items-center justify-between border-t border-slate-50">
-                           <span className={`text-[10px] font-black uppercase tracking-widest transition-colors ${isSelected ? 'text-kabarak-green' : 'text-slate-300'}`}>
-                             {isSelected ? 'Confirmed Choice' : 'Select Candidate'}
+                        <div className="mt-4 pt-4 flex items-center justify-between border-t border-gray-100">
+                           <span className={`text-xs font-bold uppercase tracking-wider ${isSelected ? 'text-kabarak-green' : 'text-gray-500'}`}>
+                             {isSelected ? 'Selected' : 'Click to Select'}
                            </span>
-                           <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isSelected ? 'bg-kabarak-green text-white rotate-90' : 'bg-slate-50 text-slate-300'}`}>
-                             <ChevronRight size={18} />
-                           </div>
                         </div>
                       </div>
                     </div>
                   );
                 })}
+                {posCandidates.length === 0 && (
+                  <div className="col-span-full py-8 text-center text-gray-500 text-sm border-2 border-dashed border-gray-200 rounded-lg">
+                    No candidates registered for this position.
+                  </div>
+                )}
               </div>
             </section>
           );
         })}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-8 z-50 pointer-events-none">
-        <div className="max-w-xl mx-auto flex items-center justify-between bg-white/80 backdrop-blur-3xl p-4 pl-10 rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,100,0,0.3)] border border-white pointer-events-auto">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-50">
+        <div className="max-w-5xl mx-auto flex items-center justify-between px-4">
           <div>
-             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Progress</p>
-             <p className="text-lg font-black text-kabarak-green">{Object.keys(votes).length} / {positions.length} Cast</p>
+             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none mb-1">Status</p>
+             <p className="text-sm font-bold text-gray-900">{Object.keys(votes).length} of {positions.length} Positions Selected</p>
           </div>
           <button 
             onClick={handleSubmitVotes}
             disabled={submitting || Object.keys(votes).length === 0}
-            className="group relative bg-kabarak-green text-white px-10 py-5 rounded-[2rem] font-black text-sm shadow-xl hover:shadow-2xl hover:bg-green-800 transition-all transform active:scale-95 disabled:opacity-30 disabled:grayscale flex items-center overflow-hidden"
+            className="flex items-center bg-kabarak-green text-white px-6 py-2.5 rounded-md font-semibold text-sm hover:bg-kabarak-darkGreen transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? (
-              <Loader2 className="animate-spin h-6 w-6" />
+              <Loader2 className="animate-spin h-5 w-5 mr-2" />
             ) : (
-              <>
-                <span className="relative z-10">Cast My Final Vote</span>
-                <VoteIcon className="ml-3 relative z-10 w-5 h-5 group-hover:rotate-12 transition-transform" />
-              </>
+              <VoteIcon className="mr-2 h-4 w-4" />
             )}
+            Cast Ballot
           </button>
         </div>
       </div>
